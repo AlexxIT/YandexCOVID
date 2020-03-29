@@ -32,9 +32,19 @@ sensor:
       value_template: "{{ state_attr('sensor.yandex_covid', 'Россия')['cured'] }}"
     covid_russia_deaths:
       friendly_name: Смертей в России
-      icon_template: mdi:emoticon-cry-outline
+      icon_template: mdi:emoticon-dead-outline
       unit_of_measurement: people
       value_template: "{{ state_attr('sensor.yandex_covid', 'Россия')['deaths'] }}"
+    covid_russia_new_cases:
+      friendly_name: Новых случаев в России
+      icon_template: mdi:emoticon-cry-outline
+      unit_of_measurement: people
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Россия')['new_cases'] }}"
+    covid_russia_tests:
+      friendly_name: Проведено тестов в России
+      icon_template: mdi:test-tube
+      unit_of_measurement: people
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Россия')['tests'] }}"
 
     covid_moscow_cases:
       friendly_name: Заражений в Москве
@@ -48,7 +58,7 @@ sensor:
       value_template: "{{ state_attr('sensor.yandex_covid', 'Москва')['cured'] }}"
     covid_moscow_deaths:
       friendly_name: Смертей в Москве
-      icon_template: mdi:emoticon-cry-outline
+      icon_template: mdi:emoticon-dead-outline
       unit_of_measurement: people
       value_template: "{{ state_attr('sensor.yandex_covid', 'Москва')['deaths'] }}"
 ```

@@ -13,6 +13,7 @@ DOMAIN = 'yandex_covid'
 
 RE_HTML = re.compile(r'class="config-view">(.+?)<')
 RE_TIME = re.compile(r', (.+?) \(')
+RE_DIV = re.compile(r'"covid-panel-view__stat-item-value">(.+?)<')
 
 
 async def async_setup_platform(hass: HomeAssistantType, config, add_entities,
@@ -53,35 +54,52 @@ class YandexCovid(Entity):
         return self._attrs
 
     async def update(self, *args):
+        text = data = None
+
         try:
             r = await self.session.get('https://yandex.ru/web-maps/covid19')
             text = await r.text()
 
             m = RE_HTML.search(text)
-            data = json.loads(m[1])
+            data = json.loads(m[1])['covidData']
 
+        except Exception as e:
+            _LOGGER.error(f"Load Data error: {e}")
+
+        try:
             self._attrs = {
                 p['name']: {
                     'cases': p['cases'],
                     'cured': p['cured'],
                     'deaths': p['deaths']
                 }
-                for p in data['covidData']['items']
+                for p in data['items']
             }
 
-            items = data['covidData']['stat']['items']
+        except Exception as e:
+            _LOGGER.error(f"Update World error: {e}")
+
+        try:
+            tests = int(data['tests'].replace(' ', ''))
+            items = [int(p.replace('\xa0', ''))
+                     for p in RE_DIV.findall(text)]
             self._attrs['Россия'] = {
-                'cases': int(items[0]['value']),
-                'new_cases': int(items[1]['value']),
-                'cured': int(items[2]['value']),
-                'deaths': int(items[3]['value'])
+                'cases': items[0],
+                'new_cases': items[1],
+                'cured': items[2],
+                'deaths': items[3],
+                'tests': tests
             }
 
-            m = re.search(r', (.+?) \(', data['covidData']['subtitle'])
+        except Exception as e:
+            _LOGGER.error(f"Update Russia error: {e}")
+
+        try:
+            m = re.search(r', (.+?) \(', data['subtitle'])
             self._state = m[1]
 
         except Exception as e:
-            _LOGGER.error(f"Update error: {e}")
+            _LOGGER.error(f"Update Sensor error: {e}")
 
         self.async_schedule_update_ha_state()
 
