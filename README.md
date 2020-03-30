@@ -4,15 +4,17 @@
 
 Сенсор по данным Яндекса: https://yandex.ru/web-maps/covid19
 
-Почему не пользоваться стандартным сенсором?
-
-У Яндекса есть региональная статистика РФ.
+Основные моменты:
+- есть **региональная статистика**, есть ли ваш регион - смотрите на карте Яндекса
+- статистика не по городам, а по регионам! Москва и Санкт-Петербург исключения
+- есть количество **проведённых тестов** по стране
+- есть **индекс самоизоляции** и он **по городам**, есть ли ваш город - смотрите на карте Яндекса
 
 ## Установка и настройка
 
 Устанавливается через HACS.
 
-Настраивается в configuration.yaml:
+Настраивается в `configuration.yaml`:
 
 ```yaml
 sensor:
@@ -61,4 +63,36 @@ sensor:
       icon_template: mdi:emoticon-dead-outline
       unit_of_measurement: people
       value_template: "{{ state_attr('sensor.yandex_covid', 'Москва')['deaths'] }}"
+    covid_moscow_isolation:
+      friendly_name: Индекс самоизоляции Москвы
+      icon_template: mdi:home-lock
+      unit_of_measurement: " "
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Москва')['isolation'] }}"
+
+    covid_samara_cases:
+      friendly_name: Заражений в Самарской области
+      icon_template: mdi:emoticon-neutral-outline
+      unit_of_measurement: people
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Самарская область')['cases'] }}"
+    covid_samara_cured:
+      friendly_name: Выздоровлений в Самарской области
+      icon_template: mdi:emoticon-happy-outline
+      unit_of_measurement: people
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Самарская область')['cured'] }}"
+    covid_samara_deaths:
+      friendly_name: Смертей в Самарской области
+      icon_template: mdi:emoticon-dead-outline
+      unit_of_measurement: people
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Самарская область')['deaths'] }}"
+
+    covid_samara_isolation:
+      friendly_name: Индекс самоизоляции Самары
+      icon_template: mdi:home-lock
+      unit_of_measurement: " "
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Самара')['isolation'] }}"
+    covid_tolyatti_isolation:
+      friendly_name: Индекс самоизоляции Тольятти
+      icon_template: mdi:home-lock
+      unit_of_measurement: " "
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Тольятти')['isolation'] }}"
 ```
