@@ -106,7 +106,7 @@ class YandexCovid(Entity):
             _LOGGER.error(f"Update Russia error: {e}")
 
         try:
-            m = re.search(r', (.+?) \(', data['subtitle'])
+            m = re.search(r', ?(.+?) \(', data['subtitle'])
             self._state = m[1]
 
         except Exception as e:
