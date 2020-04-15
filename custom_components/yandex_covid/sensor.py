@@ -71,7 +71,10 @@ class YandexCovid(Entity):
                 p['name']: {
                     'cases': p['cases'],
                     'cured': p['cured'],
-                    'deaths': p['deaths']
+                    'deaths': p['deaths'],
+                    'new_cases': (p['histogram'][-1]['value'] -
+                                  p['histogram'][-2]['value'])
+                    if 'histogram' in p and len(p['histogram']) >= 2 else 0
                 }
                 for p in data['items']
             }
