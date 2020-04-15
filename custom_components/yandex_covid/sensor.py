@@ -13,7 +13,7 @@ DOMAIN = 'yandex_covid'
 
 RE_HTML = re.compile(r'class="config-view">(.+?)<')
 RE_TIME = re.compile(r', (.+?) \(')
-RE_DIV = re.compile(r'"covid-panel-view__stat-item-value">(.+?)<')
+RE_DIV = re.compile(r'"covid-stat-view__item-value">(.+?)<')
 
 
 async def async_setup_platform(hass: HomeAssistantType, config, add_entities,
