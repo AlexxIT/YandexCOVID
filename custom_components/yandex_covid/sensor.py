@@ -54,14 +54,16 @@ class YandexCovid(Entity):
         return self._attrs
 
     async def update(self, *args):
-        text = data = None
+        text = data = token = None
 
         try:
             r = await self.session.get('https://yandex.ru/web-maps/covid19')
             text = await r.text()
 
             m = RE_HTML.search(text)
-            data = json.loads(m[1])['covidData']
+            data = json.loads(m[1])
+            token = data['csrfToken']
+            data = data['covidData']
 
         except Exception as e:
             _LOGGER.error(f"Load Data error: {e}")
@@ -83,18 +85,6 @@ class YandexCovid(Entity):
             _LOGGER.error(f"Update World error: {e}")
 
         try:
-            for city in data['isolation']['cities']:
-                name = city['name']
-                if name in self._attrs:
-                    self._attrs[name]['isolation'] = city['level']
-                else:
-                    self._attrs[name] = {'isolation': city['level']}
-
-        except Exception as e:
-            _LOGGER.error(f"Update Isolation error: {e}")
-
-        try:
-            tests = int(data['tests'].replace(' ', ''))
             items = [int(p.replace('\xa0', ''))
                      for p in RE_DIV.findall(text)]
             self._attrs['Россия'] = {
@@ -102,7 +92,6 @@ class YandexCovid(Entity):
                 'new_cases': items[1],
                 'cured': items[2],
                 'deaths': items[3],
-                'tests': tests
             }
 
         except Exception as e:
@@ -114,6 +103,25 @@ class YandexCovid(Entity):
 
         except Exception as e:
             _LOGGER.error(f"Update Sensor error: {e}")
+
+        try:
+            r = await self.session.get(
+                'https://yandex.ru/web-maps/api/covid',
+                params={'csrfToken': token, 'isolation': 'true'})
+            data = await r.json()
+
+            for city in data['data']['cities']:
+                name = city['name']
+                if name in self._attrs:
+                    self._attrs[name]['isolation'] = city['level']
+                else:
+                    self._attrs[name] = {'isolation': city['level']}
+
+            self._attrs['Россия']['tests'] = \
+                int(data['data']['tests'].replace(' ', ''))
+
+        except Exception as e:
+            _LOGGER.error(f"Update Isolation error: {e}")
 
         self.async_schedule_update_ha_state()
 
