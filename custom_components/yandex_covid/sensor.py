@@ -92,6 +92,7 @@ class YandexCovid(Entity):
                 'new_cases': items[1],
                 'cured': items[2],
                 'deaths': items[3],
+                'tests': int(data['tests'].replace(' ', ''))
             }
 
         except Exception as e:
@@ -116,9 +117,6 @@ class YandexCovid(Entity):
                     self._attrs[name]['isolation'] = city['level']
                 else:
                     self._attrs[name] = {'isolation': city['level']}
-
-            self._attrs['Россия']['tests'] = \
-                int(data['data']['tests'].replace(' ', ''))
 
         except Exception as e:
             _LOGGER.error(f"Update Isolation error: {e}")
