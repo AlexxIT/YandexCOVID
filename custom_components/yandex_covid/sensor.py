@@ -18,15 +18,17 @@ RE_TIME = re.compile(r', (.+?) \(')
 
 async def async_setup_platform(hass: HomeAssistantType, config, add_entities,
                                discovery_info=None):
-    add_entities([YandexCovid()])
+    include = config.get('include')
+    add_entities([YandexCovid(include)])
 
     return True
 
 
 class YandexCovid(Entity):
-    def __init__(self):
+    def __init__(self, include: list):
         self._attrs = None
         self._state = None
+        self.include = include
         self.session = None
 
     async def async_added_to_hass(self) -> None:
@@ -54,7 +56,7 @@ class YandexCovid(Entity):
         return self._attrs
 
     async def update(self, *args):
-        text = data = token = None
+        data = token = None
 
         try:
             r = await self.session.get('https://yandex.ru/web-maps/covid19')
@@ -69,6 +71,10 @@ class YandexCovid(Entity):
             _LOGGER.error(f"Load Data error: {e}")
 
         try:
+            if self.include:
+                data['items'] = [p for p in data['items']
+                                  if p['name'] in self.include]
+
             self._attrs = {
                 p['name']: {
                     'cases': p['cases'],
@@ -84,23 +90,24 @@ class YandexCovid(Entity):
         except Exception as e:
             _LOGGER.error(f"Update World error: {e}")
 
-        try:
-            self._attrs['Россия'] = ru = {
-                'cases': 0,
-                'cured': 0,
-                'deaths': 0,
-                'new_cases': (data['histogram'][-1]['value'] -
-                              data['histogram'][-2]['value']),
-                'tests': int(data['tests'].replace(' ', ''))
-            }
-            for p in data['items']:
-                if p.get('ru'):
-                    ru['cases'] += p['cases']
-                    ru['cured'] += p['cured']
-                    ru['deaths'] += p['deaths']
+        if not self.include or 'Россия' in self.include:
+            try:
+                self._attrs['Россия'] = ru = {
+                    'cases': 0,
+                    'cured': 0,
+                    'deaths': 0,
+                    'new_cases': (data['histogram'][-1]['value'] -
+                                  data['histogram'][-2]['value']),
+                    'tests': int(data['tests'].replace(' ', ''))
+                }
+                for p in data['items']:
+                    if p.get('ru'):
+                        ru['cases'] += p['cases']
+                        ru['cured'] += p['cured']
+                        ru['deaths'] += p['deaths']
 
-        except Exception as e:
-            _LOGGER.error(f"Update Russia error: {e}")
+            except Exception as e:
+                _LOGGER.error(f"Update Russia error: {e}")
 
         try:
             ts = datetime.fromtimestamp(data['ts'])
@@ -114,6 +121,10 @@ class YandexCovid(Entity):
                 'https://yandex.ru/web-maps/api/covid',
                 params={'csrfToken': token, 'isolation': 'true'})
             data = await r.json()
+
+            if self.include:
+                data['data']['cities'] = [p for p in data['data']['cities']
+                                          if p['name'] in self.include]
 
             for city in data['data']['cities']:
                 name = city['name']
