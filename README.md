@@ -18,10 +18,13 @@
 
 `include` - опциональный параметр, без него сенсор будет хранить данные по всему миру, что приводит к ошибкам переполнения БД у некоторых пользователей
 
+Забавный факт - Россия не участвует в суммарных данных по Миру по мнению Яндекса.
+
 ```yaml
 sensor:
 - platform: yandex_covid
   include:
+    - Мир
     - Россия
     - Москва
     - Самарская область
@@ -30,6 +33,22 @@ sensor:
 
 - platform: template
   sensors:
+    covid_world_cases:
+      friendly_name: Заражений в Мире
+      icon_template: mdi:emoticon-neutral-outline
+      unit_of_measurement: people
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Мир')['cases'] }}"
+    covid_world_cured:
+      friendly_name: Выздоровлений в Мире
+      icon_template: mdi:emoticon-happy-outline
+      unit_of_measurement: people
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Мир')['cured'] }}"
+    covid_world_deaths:
+      friendly_name: Смертей в Мире
+      icon_template: mdi:emoticon-dead-outline
+      unit_of_measurement: people
+      value_template: "{{ state_attr('sensor.yandex_covid', 'Мир')['deaths'] }}"
+
     covid_russia_cases:
       friendly_name: Заражений в России
       icon_template: mdi:emoticon-neutral-outline

@@ -71,9 +71,8 @@ class YandexCovid(Entity):
             _LOGGER.error(f"Load Data error: {e}")
 
         try:
-            if self.include:
-                data['items'] = [p for p in data['items']
-                                  if p['name'] in self.include]
+            items = [p for p in data['items'] if p['name'] in self.include] \
+                    if self.include else data['items']
 
             self._attrs = {
                 p['name']: {
@@ -84,11 +83,11 @@ class YandexCovid(Entity):
                                   p['histogram'][-2]['value'])
                     if 'histogram' in p and len(p['histogram']) >= 2 else 0
                 }
-                for p in data['items']
+                for p in items
             }
 
         except Exception as e:
-            _LOGGER.error(f"Update World error: {e}")
+            _LOGGER.error(f"Update Places error: {e}")
 
         if not self.include or 'Россия' in self.include:
             try:
@@ -108,6 +107,22 @@ class YandexCovid(Entity):
 
             except Exception as e:
                 _LOGGER.error(f"Update Russia error: {e}")
+
+        if not self.include or 'Мир' in self.include:
+            try:
+                self._attrs['Мир'] = world = {
+                    'cases': 0,
+                    'cured': 0,
+                    'deaths': 0
+                }
+                for p in data['items']:
+                    if 'ru' not in p:
+                        world['cases'] += p['cases']
+                        world['cured'] += p['cured']
+                        world['deaths'] += p['deaths']
+
+            except Exception as e:
+                _LOGGER.error(f"Update World error: {e}")
 
         try:
             ts = datetime.fromtimestamp(data['ts'])
