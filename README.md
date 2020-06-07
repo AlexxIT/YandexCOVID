@@ -8,7 +8,6 @@
 - есть **региональная статистика**, есть ли ваш регион - смотрите на карте Яндекса
 - статистика не по городам, а по регионам! Москва и Санкт-Петербург исключения
 - есть количество **проведённых тестов** по стране
-- есть **индекс самоизоляции** и он **по городам**, есть ли ваш город - смотрите на карте Яндекса
 
 ## Установка и настройка
 
@@ -111,15 +110,4 @@ sensor:
       icon_template: mdi:emoticon-dead-outline
       unit_of_measurement: people
       value_template: "{{ state_attr('sensor.yandex_covid', 'Самарская область')['deaths'] }}"
-
-    covid_samara_isolation:
-      friendly_name: Индекс самоизоляции Самары
-      icon_template: mdi:home-lock
-      unit_of_measurement: " "
-      value_template: "{{ state_attr('sensor.yandex_covid', 'Самара')['isolation'] }}"
-    covid_tolyatti_isolation:
-      friendly_name: Индекс самоизоляции Тольятти
-      icon_template: mdi:home-lock
-      unit_of_measurement: " "
-      value_template: "{{ state_attr('sensor.yandex_covid', 'Тольятти')['isolation'] }}"
 ```
