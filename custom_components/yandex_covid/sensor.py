@@ -64,7 +64,7 @@ class YandexCovid(Entity):
 
             m = RE_HTML.search(text)
             data = json.loads(m[1])
-            token = data['csrfToken']
+            # token = data['csrfToken']
             data = data['covidData']
 
         except Exception as e:
@@ -131,25 +131,26 @@ class YandexCovid(Entity):
         except Exception as e:
             _LOGGER.error(f"Update Sensor error: {e}")
 
-        try:
-            r = await self.session.get(
-                'https://yandex.ru/web-maps/api/covid',
-                params={'csrfToken': token, 'isolation': 'true'})
-            data = await r.json()
-
-            if self.include:
-                data['data']['cities'] = [p for p in data['data']['cities']
-                                          if p['name'] in self.include]
-
-            for city in data['data']['cities']:
-                name = city['name']
-                if name in self._attrs:
-                    self._attrs[name]['isolation'] = city['level']
-                else:
-                    self._attrs[name] = {'isolation': city['level']}
-
-        except Exception as e:
-            _LOGGER.error(f"Update Isolation error: {e}")
+        # try:
+        #     r = await self.session.get(
+        #         'https://yandex.ru/maps/api/covid',
+        #         params={'csrfToken': token, 'isolation': 'true'})
+        #     a = await r.read()
+        #     data = await r.json()
+        #
+        #     if self.include:
+        #         data['data']['cities'] = [p for p in data['data']['cities']
+        #                                   if p['name'] in self.include]
+        #
+        #     for city in data['data']['cities']:
+        #         name = city['name']
+        #         if name in self._attrs:
+        #             self._attrs[name]['isolation'] = city['level']
+        #         else:
+        #             self._attrs[name] = {'isolation': city['level']}
+        #
+        # except Exception as e:
+        #     _LOGGER.error(f"Update Isolation error: {e}")
 
         self.async_schedule_update_ha_state()
 
