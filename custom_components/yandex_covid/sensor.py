@@ -117,9 +117,9 @@ class YandexCovid(Entity):
                 }
                 for p in data['items']:
                     if 'ru' not in p:
-                        world['cases'] += p['cases']
-                        world['cured'] += p['cured']
-                        world['deaths'] += p['deaths']
+                        world['cases'] += p['cases'] or 0
+                        world['cured'] += p['cured'] or 0
+                        world['deaths'] += p['deaths'] or 0
 
             except Exception as e:
                 _LOGGER.error(f"Update World error: {e}")
