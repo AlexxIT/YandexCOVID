@@ -97,7 +97,7 @@ class YandexCovid(Entity):
                     'deaths': 0,
                     'new_cases': (data['histogram'][-1]['value'] -
                                   data['histogram'][-2]['value']),
-                    'tests': int(data['tests'].replace(' ', ''))
+                    # 'tests': int(data['tests'].replace(' ', ''))
                 }
                 for p in data['items']:
                     if p.get('ru'):
