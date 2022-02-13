@@ -12,7 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = 'yandex_covid'
 
-RE_HTML = re.compile(r'class="config-view">(.+?)<')
+RE_HTML = re.compile(r'class="state-view">(.+?)<')
 RE_TIME = re.compile(r', (.+?) \(')
 
 
@@ -65,7 +65,7 @@ class YandexCovid(Entity):
             m = RE_HTML.search(text)
             data = json.loads(m[1])
             # token = data['csrfToken']
-            data = data['covidData']
+            data = data['config']['covidData']
 
         except Exception as e:
             _LOGGER.error(f"Load Data error: {e}")
