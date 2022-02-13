@@ -6,5 +6,6 @@
   "dependencies": [],
   "codeowners": [
     "@AlexxIT"
-  ]
+  ],
+  "version": "1.0.1"
 }
